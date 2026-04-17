@@ -3,7 +3,6 @@ name: updata
 on:
   schedule:
     - cron: "0 21 * * *"  # 每天 UTC 21:00 (北京时间 5:00)
-    - cron: "0 9 * * *"   # 每天 UTC 9:00 (北京时间 17:00)
   workflow_dispatch:  # 允许手动触发
   push:
     branches: [ main ]
