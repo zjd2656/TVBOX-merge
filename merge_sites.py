@@ -10,7 +10,7 @@ import requests
 # 配置（全部走环境变量，带默认值）
 # ======================
 SOURCES_JSON_PATH = os.environ.get("SOURCES_JSON_PATH", "sources.json")
-TARGET_JSON_PATH = os.environ.get("TARGET_JSON_PATH", "青龙.json")
+TARGET_JSON_PATH = os.environ.get("TARGET_JSON_PATH", "TV.json")
 
 # 注意：GitHub Actions 会自动提供 GITHUB_TOKEN 环境变量
 # 但在 Secrets 中我们不能用 GITHUB_TOKEN 这个名称
