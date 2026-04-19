@@ -6,7 +6,7 @@ on:
     - cron: "0 9 * * *"   # 每天 UTC 9:00 (北京时间 17:00)
   workflow_dispatch:  # 允许手动触发
   push:
-分支: [ main ]
+    分支: [ main ]
 
 jobs:
   merge:
