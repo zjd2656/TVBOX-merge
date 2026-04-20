@@ -51,11 +51,4 @@ jobs:
           # 强制加入 FuLi.json
           git add FuLi.json
 
-          # 即使无内容变化也允许提交
-          git commit \
-            -m "🔄 自动更新站点配置 [$(date +'%Y-%m-%d %H:%M:%S')]" \
-            --allow-empty
-
-          git push origin ${{ github.ref_name }}
-
           echo "✅ 提交完成（包含空提交）"
