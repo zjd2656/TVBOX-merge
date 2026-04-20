@@ -56,6 +56,6 @@ jobs:
             -m "🔄 自动更新站点配置 [$(date +'%Y-%m-%d %H:%M:%S')]" \
             --allow-empty
 
-          git push origin${{ github.ref_name }}
+          git push origin ${{ github.ref_name }}
 
           echo "✅ 提交完成（包含空提交）"
