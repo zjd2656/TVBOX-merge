@@ -6,7 +6,7 @@ on:
     - cron: "0 9 * * *"   # UTC 09:00 → 北京 17:00
   workflow_dispatch:      # 手动触发
   push:
-    branches: [ main ]
+分支: [ main ]
 
 jobs:
   merge:
@@ -33,9 +33,9 @@ jobs:
 
       - name: 运行合并脚本
         env:
-          MY_GITHUB_TOKEN:${{ secrets.MY_GITHUB_TOKEN }}
+          MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
           GITHUB_REPO: ${{ github.repository }}
-          GITHUB_BRANCH:${{ github.ref_name }}
+          GITHUB_BRANCH: ${{ github.ref_name }}
         run: |
           echo "开始执行合并脚本..."
           python merge_sites.py
