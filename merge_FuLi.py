@@ -109,7 +109,7 @@ def main():
         lives = []
         existing_fields = {}
 
-    site_keys = {s.get("key") forin sites if s.get("key")}
+    site_keys = {s.get("key") for in sites if s.get("key")}
     live_names = {l.get("name") for l in lives if l.get("name")}
 
     # ---------- 合并 ----------
