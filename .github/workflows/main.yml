@@ -1,10 +1,15 @@
-name: 提交并推送（覆盖旧文件）
+name: 更新并替换 TV.json
 
 on:
+  schedule:
+    - cron: '0 2 * * *'
   push:
     branches:
-      - main  # 根据你的分支名称修改
+      - main
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   update-tv-json:
@@ -13,51 +18,49 @@ jobs:
     steps:
     - name: 检出仓库代码
       uses: actions/checkout@v3
+      with:
+        ref:${{ github.ref }}
 
-    - name: 设置 Git 配置
+    - name: 设置 Python 环境
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: 安装依赖
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests
+
+    - name: 运行 Python 脚本生成 TV.json
+      env:
+        MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+        GITHUB_REPO: ${{ github.repository }}
+        GITHUB_BRANCH: ${{ github.ref_name }}
+      run: |
+        python merge_sites.py
+
+    - name: 检查 TV.json 是否生成
+      id: check_tv_json
+      run: |
+        if [ -f "TV.json" ]; then
+          echo "::set-output name=tv_json_exists::true"
+        else
+          echo "TV.json 未生成。"
+          echo "::set-output name=tv_json_exists::false"
+          exit 1
+        fi
+
+    - name: 配置 Git
+      if: steps.check_tv_json.outputs.tv_json_exists == 'true'
       run: |
         git config user.name "GitHub Actions"
         git config user.email "actions@github.com"
 
-    - name: 检查文件变更
-      run: echo "检查文件变更..."
-
-    - name: 备份当前的 TV.json
-      id: backup_tv_json
-      run: |
-        if [ -f "TV.json" ]; then
-          BACKUP_FILE="TV.json.$(date +%Y-%m-%d)"
-          cp "TV.json" "${BACKUP_FILE}"
-          echo "已备份为 ${BACKUP_FILE}"
-          echo "::set-output name=backup_created::true"
-        else
-          echo "TV.json 不存在，无需备份。"
-          echo "::set-output name=backup_created::false"
-        fi
-
-    - name: 生成新的 TV.json
-      # 请根据你的实际情况修改此步骤，例如运行一个脚本生成新的 TV.json
-      run: |
-        echo '{"key": "newValue"}' > TV.json
-        # 示例：使用某个命令生成 TV.json
-        # python generate_tv_json.py > TV.json
-
-    - name: 检查新 TV.json 是否生成
-      id: check_new_tv_json
-      run: |
-        if [ -f "TV.json" ]; then
-          echo "::set-output name=new_tv_json_exists::true"
-        else
-          echo "新的 TV.json 未生成。"
-          echo "::set-output name=new_tv_json_exists::false"
-          exit 1
-        fi
-
-    - name: 提交并推送更改
-      if: steps.check_new_tv_json.outputs.new_tv_json_exists == 'true'
+    - name: 提交并强制推送 TV.json
+      if: steps.check_tv_json.outputs.tv_json_exists == 'true'
       run: |
         git add TV.json
-        git commit -m "更新 TV.json"
-        git push origin ${{ github.ref }}
+        git commit -m "自动更新 TV.json [skip ci]"
+        git push origin ${{ github.ref }} --force
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
