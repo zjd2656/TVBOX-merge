@@ -1,48 +1,83 @@
-name: updata FuLi.json
+name: updata Fuli.json
 
 on:
   schedule:
-    - cron: '0 2 * * *'
+    - cron: '0 2 * * *'  # 每天凌晨2点UTC时间运行
   push:
     branches:
       - main
-  workflow_dispatch:
+  workflow_dispatch:  # 允许手动触发
 
 permissions:
-  contents: write  # 确保有写入权限
+  contents: write  # 授予写入权限
 
 jobs:
-  update-tv-json:
+  update-fuli-json:
     runs-on: ubuntu-latest
 
     steps:
     - name: 检出仓库代码
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
-        ref: ${{ github.ref_name }}  # ✅ 修正：取分支名，无 refs/heads/ 前缀
+        ref: ${{ github.ref_name }}
+        fetch-depth: 0  # 获取完整历史记录
 
     - name: 设置 Python 环境
       uses: actions/setup-python@v4
       with:
-        python-version: '3.x'
+        python-version: '3.10'
 
     - name: 安装依赖
       run: |
         python -m pip install --upgrade pip
         pip install requests
 
-    - name: 运行 Python 脚本生成 FuLi.json
+    - name: 运行 Python 脚本生成 Fuli.json
       env:
         MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         GITHUB_REPO: ${{ github.repository }}
         GITHUB_BRANCH: ${{ github.ref_name }}
       run: |
+        echo "开始执行合并脚本..."
         python merge_FuLi.py
 
-    - name: 提交并推送 FuLi.json
+    - name: 检查脚本是否成功
+      id: check_script
       run: |
+        if [ -f "Fuli.json" ]; then
+          echo "Fuli.json 生成成功"
+          echo "::set-output name=file_exists::true"
+        else
+          echo "Fuli.json 未生成，脚本可能执行失败"
+          echo "::set-output name=file_exists::false"
+          exit 1
+        fi
+
+    - name: 提交并推送 Fuli.json
+      if: steps.check_script.outputs.file_exists == 'true'
+      run: |
+        # 打印当前工作目录和文件，确认 Fuli.json 存在
+        pwd
+        ls -la
+        
+        # Git 配置
         git config user.name "GitHub Actions"
         git config user.email "actions@github.com"
-        git add FuLi.json
-        git commit --allow-empty "Update FuLi.json by GitHub Actions"
-        git push origin main --force  # 强制推送（谨慎使用！）
+        
+        # 添加文件（确保大小写正确）
+        git add Fuli.json
+        
+        # 尝试提交：先正常提交（有变化时成功），失败则空提交
+        COMMIT_MSG="🔄 自动更新 Fuli.json - $(date +'%Y-%m-%d %H:%M:%S')"
+        if git commit -m "$COMMIT_MSG"; then
+          echo "✅ 正常提交成功（文件有变更）";
+        else
+          echo "📄 无文件改动，执行空提交...";
+          git commit --allow-empty -m "🔄 自动更新 Fuli.json（无变更）- $(date +'%Y-%m-%d %H:%M:%S')";
+        fi
+        
+        # 安全推送：用 --force-with-lease 替代 --force
+        echo "推送提交到远程仓库..."
+        git push origin ${{ github.ref_name }} --force-with-lease
+        echo "✅ 提交推送完成"
+
