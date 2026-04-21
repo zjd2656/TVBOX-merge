@@ -39,28 +39,4 @@ jobs:
       run: |
         python merge_sites.py
 
-    - name: 检查 TV.json 是否生成
-      id: check_tv_json
-      run: |
-        if [ -f "TV.json" ]; then
-          echo "::set-output name=tv_json_exists::true"
-        else
-          echo "TV.json 未生成。"
-          echo "::set-output name=tv_json_exists::false"
-          exit 1
-        fi
-
-    - name: 配置 Git
-      if: steps.check_tv_json.outputs.tv_json_exists == 'true'
-      run: |
-        git config user.name "GitHub Actions"
-        git config user.email "actions@github.com"
-
-    - name: 提交并强制推送 TV.json
-      if: steps.check_tv_json.outputs.tv_json_exists == 'true'
-      run: |
-        git add TV.json
-        git commit -m "自动更新 TV.json [skip ci]"
-        git push origin ${{ github.ref }} --force
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+   
