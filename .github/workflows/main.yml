@@ -1,4 +1,4 @@
-name: 更新并替换 TV.json
+name: updata TV.json
 
 on:
   schedule:
@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: write  # 确保有写入权限
 
 jobs:
   update-tv-json:
@@ -19,7 +19,7 @@ jobs:
     - name: 检出仓库代码
       uses: actions/checkout@v3
       with:
-        ref: ${{ github.ref }}
+        ref: ${{ github.ref_name }}  # ✅ 修正：取分支名，无 refs/heads/ 前缀
 
     - name: 设置 Python 环境
       uses: actions/setup-python@v4
@@ -39,4 +39,10 @@ jobs:
       run: |
         python merge_sites.py
 
-   
+    - name: 提交并推送 TV.json
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git add TV.json
+        git commit -m "Update TV.json by GitHub Actions"
+        git push origin main --force  # 强制推送（谨慎使用！）
