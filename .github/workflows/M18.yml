@@ -44,5 +44,5 @@ jobs:
         git config user.name "GitHub Actions"
         git config user.email "actions@github.com"
         git add FuLi.json
-        git commit -m "Update FuLi.json by GitHub Actions"
+        git commit --allow-empty "Update FuLi.json by GitHub Actions"
         git push origin main --force  # 强制推送（谨慎使用！）
