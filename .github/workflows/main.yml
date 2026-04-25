@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: '0 2 * * *'  # 每天凌晨2点UTC时间运行
   push:
-分支:
+    分支:
       - main
   workflow_dispatch:  # 允许手动触发
 
