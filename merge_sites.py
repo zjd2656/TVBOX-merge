@@ -170,11 +170,6 @@ def git_force_push(target_file_path, commit_message):
     except Exception as e:
         print(f"[Git] 异常: {e}")
         return False
-    finally:
-        # 可选：清理本地仓库目录（如果不想保留）
-        # if os.path.exists(repo_dir):
-        #     shutil.rmtree(repo_dir)
-
 # ======================
 # 主流程
 # ======================
