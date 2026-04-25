@@ -207,7 +207,7 @@ def main():
         lives = []
         existing_fields = {}
 
-    site_keys = {s.get("key") forin sites if s.get("key")}
+    site_keys = {s.get("key") for s in sites if s.get("key")}
     live_names = {l.get("name") for l in lives if l.get("name")}
 
     # ---------- 合并 ----------
@@ -225,7 +225,7 @@ def main():
         data = get_data_from_url(url)
 
         # 合并 sites
-        forin data.get("sites", []):
+        for s in data.get("sites", []):
             key = s.get("key")
             if key and key not in site_keys:
                 sites.append(fix_item_paths(s, base))
